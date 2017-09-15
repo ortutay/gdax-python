@@ -10,6 +10,7 @@ import time
 import requests
 import base64
 import json
+import urllib
 from requests.auth import AuthBase
 from gdax.public_client import PublicClient
 
@@ -99,11 +100,16 @@ class AuthenticatedClient(PublicClient):
         # r.raise_for_status()
         return r.json()
 
-    def get_orders(self, product_id=''):
+    def get_orders(self, product_id='', status=None):
         result = []
         url = self.url + '/orders/'
+        args = {}
         if product_id:
-            url += "?product_id={}&".format(product_id)
+            args['product_id'] = product_id
+        if status:
+            args['status'] = status
+        if args:
+            url += '?' + urllib.parse.urlencode(args)
         r = requests.get(url, auth=self.auth, timeout=30)
         # r.raise_for_status()
         result.append(r.json())
